@@ -15,9 +15,25 @@ library(EnsDb.Hsapiens.v86)
 library(clusterProfiler)
 memory.limit(50000000)
 
-clinical.tcga=readRDS("e:/my_study/Project/TCGA.DATA/clinical/clinical.joint.rds")
-express.tcga=readRDS("e:/my_study/Project/TCGA.DATA/pancancer/tcga.express.filter.1.1.rds")
-msi.3=fread("E:/my_study/Project/TCGA.DATA/pancancer/TCGASubtype.20170308.tsv.gz")
+clinical.tcga=readRDS("~/clinical.joint.rds")
+
+express.tcga=fread("~/tcga_RSEM_Hugo_norm_count.gz")
+express.tcga=data.frame(express.tcga)
+express.tcga=express.tcga[!duplicated(express.tcga$sample),]
+rownames(express.tcga)=express.tcga$sample
+express.tcga=express.tcga[,-1]
+colnames(express.tcga)=gsub("\\.","-",colnames(express.tcga))
+express.tcga=na.omit(express.tcga)
+express.tcga.cpm=2^express.tcga-1
+express.tcga.cpm= t(t(express.tcga.cpm)/colSums(express.tcga.cpm) * 1000000)
+keep=rowSums(express.tcga.cpm >= 1 ) >= 1
+express.tcga=express.tcga[keep,]
+express.tcga=express.tcga[,colnames(express.tcga) %in% c(paste(clinical.joint$patient,"-01",sep = ""),melanoma.sample.06)]
+sum.row=data.frame(colSums(express.tcga))
+patient.outlier=rownames(sum.row)[sum.row$"colSums.express.tcga."<10000]
+express.tcga=express.tcga[,!colnames(express.tcga) %in% patient.outlier]
+
+msi.3=fread("~/TCGASubtype.20170308.tsv.gz")
 msi.3=left_join(msi.3,clinical.tcga[,c(9,6,8)],by=c("sampleID"="sample"))
 msi.3$patient=substr(msi.3$sampleID,1,12)
 

@@ -10,11 +10,11 @@ library(purrr)
 library(grid)
 
 
-clinic.gtex=fread("e:/my_study/Project/GTEX/GTEX_phenotype.gz")
+clinic.gtex=fread("~/GTEX_phenotype.gz")
 clinic.gtex=clinic.gtex[!grepl("Cells",clinic.gtex$`body_site_detail (SMTSD)`),]
 
 
-express.gtex=fread("E:/my_study/Project/GTEX/gtex_RSEM_Hugo_norm_count.gz")
+express.gtex=fread("~/gtex_RSEM_Hugo_norm_count.gz")
 express.gtex=data.frame(express.gtex)
 express.gtex=express.gtex[!duplicated(express.gtex$sample),]
 rownames(express.gtex)=express.gtex$sample

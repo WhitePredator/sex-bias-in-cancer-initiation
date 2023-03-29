@@ -26,7 +26,7 @@ patient.outlier=rownames(sum.row)[sum.row$"colSums.express.tcga."<10000]
 express.tcga=express.tcga[,!colnames(express.tcga) %in% patient.outlier]
 
 probe=fread("~/gencode.v22.annotation.gene.probeMap")
-express.ucec=data.frame(fread("E:/my_study/Project/TCGA.DATA/cancertype/TCGA-UCEC.htseq_counts.tsv.gz"))
+express.ucec=data.frame(fread("~/TCGA-UCEC.htseq_counts.tsv.gz"))
 express.ucec=left_join(express.ucec,probe[,c(1,2)],by=c("Ensembl_ID"="id"))
 express.ucec=express.ucec[,c(1,ncol(express.ucec),2:(ncol(express.ucec)-1))]
 express.ucec=na.omit(express.ucec)
@@ -45,14 +45,11 @@ y <- y[keep,, keep.lib.sizes=FALSE]
 y=log2(y$counts+1)
 save.y=data.frame(y)
 
-# saveRDS(save.y,file = "E:/my_study/Project/TCGA.DATA/UCEC.rds")
-# express.tcga=readRDS("e:/my_study/Project/TCGA.DATA/pancancer/tcga.express.filter.1.1.rds")
-# express.ucec=readRDS("E:/my_study/Project/TCGA.DATA/UCEC.rds")
 colnames(express.ucec)=gsub("\\.","-",colnames(express.ucec))
 
 
-maf=fread("E:/my_study/Project/TCGA.DATA/MAF/mc3.v0.2.8.PUBLIC.maf")
-maf.keep=readRDS(file = "E:/my_study/Project/cancer_risk/code2020.9.22/maf.keep.rds")
+maf=fread("~/mc3.v0.2.8.PUBLIC.maf")
+maf.keep=readRDS(file = "~/maf.keep.rds")
 maf.keep$join=paste(maf.keep$gene,maf.keep$patient,maf.keep$HGVSc,sep = ".")
 maf2paint=maf[,c("Hugo_Symbol","Tumor_Sample_Barcode","Transcript_ID","Chromosome","Start_Position","HGVSc","HGVSp","Variant_Classification")]
 maf2paint$join=paste(maf2paint$Hugo_Symbol,substr(maf2paint$Tumor_Sample_Barcode,1,12),maf2paint$HGVSc,sep = ".")
@@ -61,7 +58,7 @@ maf.use=maf.use[!duplicated(maf.use$join),]
 maf.use=maf.use[,c(8:15)]
 colnames(maf.use)=c("Hugo_Symbol","Tumor_Sample_Barcode","Transcript_ID","Chromosome","Start_Position","HGVSc","HGVSp","Variant_Classification")
 maf.use$submitter_id=substr(maf.use$Tumor_Sample_Barcode,1,12)
-clinical.biolinks=readRDS("E:/my_study/Project/TCGA.DATA/clinical/clinical_tcgabiolinks.rds")
+clinical.biolinks=readRDS("~/clinical_tcgabiolinks.rds")
 clinical.joint=clinical.biolinks[,c(1,5,6,7,25,28,31,33,42)]
 clinical.joint$submitter_id=paste(clinical.joint$submitter_id,"-01",sep = "")
 maf.use=left_join(maf.use,clinical.joint[,c(1,7,8,9)],by="submitter_id")

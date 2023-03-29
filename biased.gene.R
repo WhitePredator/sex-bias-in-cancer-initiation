@@ -74,6 +74,7 @@ maf.all=rbind(maf.fuc.lost,maf.sift.polyphen)
 maf.all=rbind(maf.all,maf.high.freq[,-(7:8)])
 maf.all=maf.all[!duplicated(maf.all),]
 maf.all=maf.all[maf.all$Variant_Classification!="Silent",]
+saveRDS(maf.all,file = "~/maf.keep.rds")
 
 maf.all=maf.all[,c(1,2,3)]
 maf.all=left_join(maf.all,clinical.joint[,c(1,7,8,9)],by="patient")
@@ -165,7 +166,6 @@ get.gene.test=function(gene=gene,cancer.maf=cancer.maf,cancer.patient=cancer.pat
     colnames(gene.mutation)[5]="age"
     gene.mutation[is.na(gene.mutation$age),"age"]=mean(na.omit(gene.mutation$age))
     gene.mutation$gender=ifelse(gene.mutation$gender=="male",1,0)
-    # dummy.feature <- setdiff(colnames(gene.mutation),c("patient","mutation","gender","age"))
     dummy.feature <- c("tumor_stage","alcohol_history","years_smoked","race")  
     lr.dummy <- dummy.data.frame(gene.mutation, names=dummy.feature)
     dummy.list <- attr(lr.dummy,"dummies")
