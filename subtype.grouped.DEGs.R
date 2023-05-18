@@ -141,6 +141,11 @@ for(j in 1:length(cancer.focus)){
   cancer.sample=group.list[[j]]$sampleID
   cancer.express=express.tcga[colnames(express.tcga) %in% cancer.sample]
   cancer.express=na.omit(cancer.express)
+  thr.express=cancer.express["THRA",]+cancer.express["THRB",]
+  hif.express=cancer.express["HIF1A",]-cancer.express["HIF3A",]
+  combine.gene=rbind(thr.express,hif.express)
+  rownames(combine.gene)=c("THR","HIF")
+  cancer.express=rbind(cancer.express,combine.gene)
   design.tmp=data.frame(sample=colnames(cancer.express))
   design.tmp=left_join(design.tmp,group.list[[j]][,c(1,6)],by=c("sample"="sampleID"))
   design.tmp=left_join(design.tmp,clinical.tcga,by="sample")
@@ -157,8 +162,12 @@ for(j in 1:length(cancer.focus)){
   vfit <- lmFit(cancer.express,design)
   efit <- eBayes(vfit,robust=TRUE,trend=TRUE)
   DEG.cimp = topTable(efit, coef=2, n=Inf)
+  DEG.cimp$gene=rownames(DEG.cimp)
   DEGs.pvalue[[cancer.focus[j]]]=DEG.cimp
 }
 
+
+
 library(openxlsx)
 write.xlsx(DEGs.pvalue, "~/subtype.grouped.DEGs.xlsx",rowNames = TRUE) 
+
